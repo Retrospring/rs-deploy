@@ -2,7 +2,7 @@
 lock "3.13.0"
 
 set :application, "retrospring"
-set :repo_url, "git@git.rrerr.net:nilsding/retrospring.git"
+set :repo_url, "https://github.com/Retrospring/retrospring.git"
 
 # Default branch is :master
 ask :branch, "master"
@@ -32,9 +32,6 @@ append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/uplo
 
 # Default value for keep_releases is 5
 # set :keep_releases, 5
-
-# Ruby version / RVM
-set :rvm1_ruby_version, '2.3.3@retrospring'
 
 # Create JS i18n files before precompiling assets
 before 'deploy:assets:precompile', 'deploy:i18n_js'
