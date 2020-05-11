@@ -1,9 +1,7 @@
 # rs-deploy
 
-a Capistrano deploy script.
+This deploys Retrospring to a server using the power of Ansible.
 
 ## Usage:
 
-- `bundle install` (initially)
-- `bundle exec cap production deploy`
-
+TBD
