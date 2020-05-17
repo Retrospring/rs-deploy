@@ -1,0 +1,62 @@
+---
+- set_fact:
+    ruby_build_dependencies:
+      - '@Development Tools'
+      - openssl-devel
+      - libyaml-devel
+      - readline-devel
+      - zlib-devel
+
+- name: "Install build dependencies"
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ ruby_build_dependencies }}"
+
+- block:
+  - name: "Checkout rbenv repo"
+    git:
+      repo: "https://github.com/rbenv/rbenv.git"
+      dest: "~/.rbenv"
+
+  - name: "Create plugins directory"
+    file:
+      state: directory
+      path: "~/.rbenv/plugins"
+
+  - name: "Install plugins"
+    git:
+      repo: "{{ item.repo }}"
+      dest: "~/.rbenv/plugins/{{ item.name }}"
+    loop: "{{ rbenv_plugins }}"
+
+  - name: "Set default gems"
+    copy:
+      src: "default-gems"
+      dest: "~/.rbenv/default-gems"
+
+  - name: "Install gemrc"
+    copy:
+      src: "gemrc"
+      dest: "~/.gemrc"
+      force: false
+
+  - name: "Install Ruby {{ ruby_version }}"
+    shell: |-
+      $SHELL -lc "~/.rbenv/bin/rbenv install --skip-existing {{ ruby_version }}"
+
+  - name: "Set ruby {{ ruby_version }} as default"
+    shell: |-
+      $SHELL -lc "~/.rbenv/bin/rbenv global {{ ruby_version }} && ~/.rbenv/bin/rbenv rehash"
+
+  - name: "Set up bashrc for rbenv"
+    blockinfile:
+      marker: "# {mark} ANSIBLE MANAGED BLOCK :: rs-deploy/rbenv"
+      path: "~/.bashrc"
+      block: |
+        PATH=$HOME/.rbenv/bin:$PATH:$HOME/.local/bin:$HOME/bin
+        export PATH
+        eval "$(rbenv init -)"
+
+  become: true
+  become_user: justask

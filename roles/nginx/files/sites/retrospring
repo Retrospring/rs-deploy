@@ -1,0 +1,68 @@
+# Site configuration for retrospring
+#
+# This file is managed by Ansible.  Changes made here will be lost.
+
+# We don't like www.
+server {
+    listen *:80;
+    include rrerr.d/ssl-retrospring.conf;
+
+    server_name www.retrospring.net;
+    server_tokens off;
+
+    return 301 $scheme://retrospring.net$request_uri;
+}
+
+# This is a normal HTTP host which redirects all traffic to the HTTPS host.
+server {
+    listen *:80;
+    server_name retrospring.net;
+    server_tokens off;
+
+    # root doesn't have to be a valid path since we are redirecting
+    root /nowhere;
+
+    rewrite ^ https://$server_name$request_uri permanent;
+}
+
+# Some upstreams where requests are redirected to.
+upstream justask {
+    server unix:/var/run/justask-web-01/puma.sock;
+    server unix:/var/run/justask-web-02/puma.sock;
+}
+
+server {
+    # ansible:replace lets_encrypt_site
+    include rrerr.d/ssl-retrospring.conf;
+
+    include rrerr.d/cloudflare.conf;
+
+    server_name retrospring.net;
+
+    # topkek
+    if ($http_user_agent ~ PhantomJS) {
+        return 301 http://bad-dragon.com;
+    }
+
+    root /home/justask/apps/retrospring/current/public;
+    access_log /var/log/nginx/retrospring-new.log;
+
+    client_max_body_size 5M;
+
+    error_page 404 = /404.html;
+    error_page 422 = /422.html;
+    error_page 500 = /500.html;
+    error_page 502 = /502.html;
+
+    try_files $uri @retrospring;
+
+    location @retrospring {
+        proxy_set_header  X-Real-IP  $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_max_temp_file_size 0;
+
+        proxy_pass http://justask;
+        break;
+    }
+}
