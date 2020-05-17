@@ -39,11 +39,6 @@ server {
 
     server_name retrospring.net;
 
-    # topkek
-    if ($http_user_agent ~ PhantomJS) {
-        return 301 http://bad-dragon.com;
-    }
-
     root /home/justask/apps/retrospring/current/public;
     access_log /var/log/nginx/retrospring-new.log;
 
