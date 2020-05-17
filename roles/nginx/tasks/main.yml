@@ -1,0 +1,7 @@
+---
+- name: "Install nginx config"
+  copy:
+    src: sites/retrospring
+    dest: "/etc/nginx/sites-enabled/retrospring"
+    force: yes
+  notify: "Reload nginx config"

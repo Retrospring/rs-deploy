@@ -1,12 +1,11 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
-# Deployment
-group :development do
-  gem 'capistrano', '~> 3.8', require: false
-  gem 'capistrano-rails', require: false
+git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
-  gem 'rbnacl', '>= 3.2', '< 5.0', require: false
-  gem 'rbnacl-libsodium', require: false
-  gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0', require: false
-  gem 'ed25519', require: false
-end
+# gem "rails"
+
+gem "test-kitchen", "~> 2.5"
+gem "kitchen-ansible", "~> 0.50.1"
+gem "kitchen-vagrant", "~> 1.6"

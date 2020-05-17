@@ -1,0 +1,27 @@
+---
+
+###############################################################################
+# Ensure only one web worker instance is enabled, we do not want to start both
+# at boot time
+- name: "Ensure web@01 is enabled"
+  systemd:
+    name: "justask-web@01"
+    enabled: yes
+- name: "Ensure web@02 is disabled"
+  systemd:
+    name: "justask-web@02"
+    enabled: no
+
+###############################################################################
+# Restart one of the servers accordingly.  This is done via a shell script
+# because Ansible can be kinda weird at times.
+
+- name: "Copy latest version of the restart script"
+  copy:
+    src: "restart.sh"
+    dest: "/root/restart.sh"
+    mode: "0755"
+
+- name: "Restart the web server"
+  command: "/root/restart.sh"
+

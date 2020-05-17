@@ -1,0 +1,101 @@
+---
+- block:
+  - name: "Determine release version"
+    set_fact:
+      release_version: "{{ ansible_date_time.iso8601_basic_short }}"
+
+  - name: "Determine application release path"
+    set_fact:
+      release_path: "{{ justask_base_app_path }}/releases/{{ release_version }}"
+
+  - name: "Ensure basic directories exist"
+    file:
+      path: "{{ item }}"
+      state: directory
+    loop:
+      - "{{ justask_base_app_path }}"
+      - "{{ justask_base_app_path }}/releases"
+      - "{{ release_path }}"
+      - "{{ justask_base_app_path }}/shared/bundle"
+      - "{{ justask_base_app_path }}/shared/config"
+      - "{{ justask_base_app_path }}/shared/config/initializers"
+      - "{{ justask_base_app_path }}/shared/log"
+      - "{{ justask_base_app_path }}/shared/public"
+      - "{{ justask_base_app_path }}/shared/tmp"
+
+  - name: "Update repo"
+    git:
+      repo: https://github.com/Retrospring/retrospring.git
+      dest: "{{ justask_base_app_path }}/repo"
+      bare: yes
+      update: yes
+
+  - name: "Create release"
+    shell: |-
+      git archive master | /usr/bin/env tar -x -f - -C {{ release_path }}
+    args:
+      chdir: "{{ justask_base_app_path }}/repo"
+
+  - name: "Record REVISION"
+    shell: |-
+      git rev-parse master > {{ release_path }}/REVISION
+    args:
+      chdir: "{{ justask_base_app_path }}/repo"
+
+  - name: "Symlink shared files"
+    file:
+      src: "{{ justask_base_app_path }}/shared/{{ item }}"
+      dest: "{{ release_path }}/{{ item }}"
+      state: link
+      force: yes
+    loop: "{{ justask_shared_files }}"
+
+  - name: "Ensure shared dirs exist"
+    file:
+      path: "{{ justask_base_app_path }}/shared/{{ item }}"
+      state: directory
+    loop: "{{ justask_shared_dirs }}"
+  - name: "Remove dirs we need to symlink"
+    file:
+      dest: "{{ release_path }}/{{ item }}"
+      state: absent
+    loop: "{{ justask_shared_dirs }}"
+  - name: "Symlink shared dirs"
+    file:
+      src: "{{ justask_base_app_path }}/shared/{{ item }}"
+      dest: "{{ release_path }}/{{ item }}"
+      state: link
+      force: yes
+    loop: "{{ justask_shared_dirs }}"
+
+  - name: "Install the bundle"
+    shell: |-
+      $SHELL -lc "bundle config build.pg --with-pg-config=/usr/pgsql-10/bin/pg_config"
+      $SHELL -lc "bundle config set without 'development test'"
+      $SHELL -lc "bundle config set path '{{ justask_base_app_path }}/shared/bundle'"
+      $SHELL -lc "bundle install --jobs=3"
+    args:
+      chdir: "{{ release_path }}"
+
+  - name: "Run Rake tasks"
+    shell: |-
+      $SHELL -lc "env RAILS_ENV=production bundle exec rails {{ item }}"
+    args:
+      chdir: "{{ release_path }}"
+    loop: "{{ justask_rake_tasks }}"
+
+  - name: "Run database migrations"
+    shell: |-
+      $SHELL -lc "env RAILS_ENV=production bundle exec rails db:migrate"
+    args:
+      chdir: "{{ release_path }}"
+
+  - name: "Create a symlink to the current release -- we're done here!"
+    file:
+      src: "{{ release_path }}"
+      dest: "{{ justask_base_app_path }}/current"
+      state: link
+      force: yes
+
+  become: true
+  become_user: justask

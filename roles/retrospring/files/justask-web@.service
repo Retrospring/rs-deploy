@@ -1,0 +1,20 @@
+# This file is managed by Ansible.  Changes made here will be lost.
+
+[Unit]
+Description=justask-web
+After=network.target
+
+[Service]
+Type=simple
+User=justask
+RuntimeDirectory=justask-web-%i
+WorkingDirectory=/home/justask/apps/retrospring/current
+ExecStart=/home/justask/.rbenv/shims/bundle exec puma -C config/puma.rb -b unix:///var/run/justask-web-%i/puma.sock
+ExecReload=/bin/kill -SIGUSR1 $MAINPID
+TimeoutSec=15
+Restart=always
+
+Environment="RAILS_ENV=production"
+
+[Install]
+WantedBy=multi-user.target

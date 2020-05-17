@@ -1,0 +1,22 @@
+justask_base_app_path: "/home/justask/apps/retrospring"
+
+justask_shared_files:
+  - "config/database.yml"
+  - "config/justask.yml"
+  - "config/secrets.yml"
+  - "config/puma.rb"
+  - "config/newrelic.yml"
+  - "config/initializers/devise.rb"
+
+justask_shared_dirs:
+  - "log"
+  - "tmp/pids"
+  - "tmp/cache"
+  - "tmp/sockets"
+  - "public/uploads"
+  - "public/system"
+  - "public/exports"
+
+justask_rake_tasks:
+  - "i18n:js:export"
+  - "assets:precompile"

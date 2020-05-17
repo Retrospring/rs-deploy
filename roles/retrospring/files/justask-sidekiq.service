@@ -1,0 +1,18 @@
+# This file is managed by Ansible.  Changes made here will be lost.
+
+[Unit]
+Description=justask-sidekiq
+After=network.target
+
+[Service]
+Type=simple
+User=justask
+WorkingDirectory=/home/justask/apps/retrospring/current
+ExecStart=/home/justask/.rbenv/shims/bundle exec sidekiq -C ./config/sidekiq.yml
+TimeoutSec=15
+Restart=always
+
+Environment="RAILS_ENV=production"
+
+[Install]
+WantedBy=multi-user.target

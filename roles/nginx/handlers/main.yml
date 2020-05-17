@@ -1,0 +1,6 @@
+---
+- name: "Reload nginx config"
+  systemd:
+    name: nginx
+    daemon_reload: yes
+    state: reloaded

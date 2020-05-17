@@ -1,9 +1,15 @@
 # rs-deploy
 
-a Capistrano deploy script.
+This deploys Retrospring to a server using the power of Ansible.
 
-## Usage:
+## Usage
 
-- `bundle install` (initially)
-- `bundle exec cap production deploy`
-
+1. Create a inventory file like this:
+```toml
+[retrospring]
+retrospring-host ansible_user=root
+```
+2. Run the playbook:
+```
+ansible-playbook ./default.yml -i inventory
+```
