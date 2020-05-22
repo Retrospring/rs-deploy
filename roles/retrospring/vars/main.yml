@@ -7,6 +7,7 @@ justask_shared_files:
   - "config/puma.rb"
   - "config/newrelic.yml"
   - "config/initializers/devise.rb"
+  - "app/controllers/ajax/question_controller.rb"
 
 justask_shared_dirs:
   - "log"
