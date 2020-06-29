@@ -8,6 +8,7 @@ justask_shared_files:
   - "config/newrelic.yml"
   - "config/initializers/devise.rb"
   - "app/controllers/ajax/question_controller.rb"
+  - "app/controllers/user/registrations_controller.rb"
 
 justask_shared_dirs:
   - "log"
