@@ -48,12 +48,3 @@
 
 - name: "Restart web"
   import_tasks: restart-web.yml
-
-- name: "Mark a deployment in New Relic"
-  shell: |-
-    $SHELL -lc 'bundle exec newrelic deployments -e production -u "Ansible" -r "$(cat REVISION)"'
-  args:
-    chdir: "{{ justask_base_app_path }}/current"
-  ignore_errors: yes
-  become: true
-  become_user: justask
