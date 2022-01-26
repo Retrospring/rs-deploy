@@ -8,7 +8,7 @@
 
 - name: "Figure out which Ruby version to use"
   uri:
-    url: "https://raw.githubusercontent.com/Retrospring/retrospring/master/.ruby-version"
+    url: "https://raw.githubusercontent.com/Retrospring/retrospring/main/.ruby-version"
     return_content: yes
   register: ruby_version_response
 - set_fact:

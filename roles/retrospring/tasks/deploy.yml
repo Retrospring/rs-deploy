@@ -1,4 +1,4 @@
----
+--
 - block:
   - name: "Determine release version"
     set_fact:
@@ -32,13 +32,13 @@
 
   - name: "Create release"
     shell: |-
-      git archive master | /usr/bin/env tar -x -f - -C {{ release_path }}
+      git archive main | /usr/bin/env tar -x -f - -C {{ release_path }}
     args:
       chdir: "{{ justask_base_app_path }}/repo"
 
   - name: "Record REVISION"
     shell: |-
-      git rev-parse master > {{ release_path }}/REVISION
+      git rev-parse main > {{ release_path }}/REVISION
     args:
       chdir: "{{ justask_base_app_path }}/repo"
 
