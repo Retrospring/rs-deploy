@@ -1,4 +1,4 @@
---
+---
 - block:
   - name: "Determine release version"
     set_fact:
