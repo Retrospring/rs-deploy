@@ -90,6 +90,12 @@
       chdir: "{{ release_path }}"
     loop: "{{ justask_rake_tasks }}"
 
+  - name: "Export locale"
+    shell: |-
+      $SHELL -lc "env RAILS_ENV=production bundle exec i18n expot"
+    args:
+      chdir: "{{ release_path }}"
+
   - name: "Run database migrations"
     shell: |-
       $SHELL -lc "env RAILS_ENV=production bundle exec rails db:migrate"
