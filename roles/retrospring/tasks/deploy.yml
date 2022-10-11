@@ -92,7 +92,7 @@
 
   - name: "Export locale"
     shell: |-
-      $SHELL -lc "env RAILS_ENV=production bundle exec i18n expot"
+      $SHELL -lc "env RAILS_ENV=production bundle exec i18n export"
     args:
       chdir: "{{ release_path }}"
 
