@@ -17,5 +17,4 @@ justask_shared_dirs:
   - "public/exports"
 
 justask_rake_tasks:
-  - "i18n:js:export"
   - "assets:precompile"
