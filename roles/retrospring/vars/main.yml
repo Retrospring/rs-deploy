@@ -9,6 +9,7 @@ justask_shared_files:
 
 justask_shared_dirs:
   - "log"
+  - "node_modules"
   - "tmp/pids"
   - "tmp/cache"
   - "tmp/sockets"
