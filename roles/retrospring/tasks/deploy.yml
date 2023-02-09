@@ -77,24 +77,6 @@
     args:
       chdir: "{{ release_path }}"
 
-  - name: "Install JavaScript dependencies"
-    shell: |-
-      $SHELL -lc "yarn install --frozen-lockfile"
-    args:
-      chdir: "{{ release_path }}"
-
-  - name: "Generate testing locale"
-    shell: |-
-      $SHELL -lc "env RAILS_ENV=production bundle exec rails locale:generate"
-    args:
-      chdir: "{{ release_path }}"
-
-  - name: "Export js locale"
-    shell: |-
-      $SHELL -lc "env RAILS_ENV=production bundle exec i18n export"
-    args:
-      chdir: "{{ release_path }}"
-
   - name: "Run Rake tasks"
     shell: |-
       $SHELL -lc "env RAILS_ENV=production bundle exec rails {{ item }}"

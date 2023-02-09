@@ -2,5 +2,5 @@
 - hosts: retrospring
   become: yes
   roles:
-    - name: nginx
+    #- name: nginx
     - name: retrospring

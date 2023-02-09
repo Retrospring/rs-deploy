@@ -33,7 +33,6 @@
     dest: "/etc/systemd/system/{{ item }}.service"
     mode: "0644"
   loop:
-    - justask-web@
     - justask-sidekiq
 
 - name: "Reload SystemD"
@@ -46,5 +45,13 @@
     enabled: yes
     state: restarted
 
-- name: "Restart web"
-  import_tasks: restart-web.yml
+# no more web on this instance
+- name: "Ensure web@01 is disabled"
+  systemd:
+    name: "justask-web@01"
+    enabled: no
+
+- name: "Ensure web@02 is disabled"
+  systemd:
+    name: "justask-web@02"
+    enabled: no
