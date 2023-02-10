@@ -17,5 +17,3 @@ justask_shared_dirs:
   - "public/uploads"
   - "public/system"
   - "public/export"
-
-justask_rake_tasks: []

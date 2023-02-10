@@ -2,11 +2,11 @@
 - block:
   - name: "Determine release version"
     set_fact:
-      release_version: "{{ ansible_date_time.iso8601_basic_short }}"
+      _release_version: "{{ ansible_date_time.iso8601_basic_short }}"
 
   - name: "Determine application release path"
     set_fact:
-      release_path: "{{ justask_base_app_path }}/releases/{{ release_version }}"
+      _release_path: "{{ justask_base_app_path }}/releases/{{ _release_version }}"
 
   - name: "Ensure basic directories exist"
     file:
@@ -15,7 +15,7 @@
     loop:
       - "{{ justask_base_app_path }}"
       - "{{ justask_base_app_path }}/releases"
-      - "{{ release_path }}"
+      - "{{ _release_path }}"
       - "{{ justask_base_app_path }}/shared/bundle"
       - "{{ justask_base_app_path }}/shared/config"
       - "{{ justask_base_app_path }}/shared/config/initializers"
@@ -32,20 +32,20 @@
 
   - name: "Create release"
     shell: |-
-      git archive main | /usr/bin/env tar -x -f - -C {{ release_path }}
+      git archive {{ rs_version }} | /usr/bin/env tar -x -f - -C {{ _release_path }}
     args:
       chdir: "{{ justask_base_app_path }}/repo"
 
   - name: "Record REVISION"
     shell: |-
-      git rev-parse main > {{ release_path }}/REVISION
+      git rev-parse {{ rs_version }} > {{ _release_path }}/REVISION
     args:
       chdir: "{{ justask_base_app_path }}/repo"
 
   - name: "Symlink shared files"
     file:
       src: "{{ justask_base_app_path }}/shared/{{ item }}"
-      dest: "{{ release_path }}/{{ item }}"
+      dest: "{{ _release_path }}/{{ item }}"
       state: link
       force: yes
     loop: "{{ justask_shared_files }}"
@@ -57,13 +57,13 @@
     loop: "{{ justask_shared_dirs }}"
   - name: "Remove dirs we need to symlink"
     file:
-      dest: "{{ release_path }}/{{ item }}"
+      dest: "{{ _release_path }}/{{ item }}"
       state: absent
     loop: "{{ justask_shared_dirs }}"
   - name: "Symlink shared dirs"
     file:
       src: "{{ justask_base_app_path }}/shared/{{ item }}"
-      dest: "{{ release_path }}/{{ item }}"
+      dest: "{{ _release_path }}/{{ item }}"
       state: link
       force: yes
     loop: "{{ justask_shared_dirs }}"
@@ -75,27 +75,7 @@
       $SHELL -lc "bundle config set path '{{ justask_base_app_path }}/shared/bundle'"
       $SHELL -lc "bundle install --jobs=3"
     args:
-      chdir: "{{ release_path }}"
-
-  - name: "Run Rake tasks"
-    shell: |-
-      $SHELL -lc "env RAILS_ENV=production bundle exec rails {{ item }}"
-    args:
-      chdir: "{{ release_path }}"
-    loop: "{{ justask_rake_tasks }}"
-
-  - name: "Run database migrations"
-    shell: |-
-      $SHELL -lc "env RAILS_ENV=production bundle exec rails db:migrate"
-    args:
-      chdir: "{{ release_path }}"
-
-  - name: "Create a symlink to the current release -- we're done here!"
-    file:
-      src: "{{ release_path }}"
-      dest: "{{ justask_base_app_path }}/current"
-      state: link
-      force: yes
+      chdir: "{{ _release_path }}"
 
   become: true
   become_user: justask

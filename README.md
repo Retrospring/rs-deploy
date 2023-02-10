@@ -11,5 +11,5 @@ retrospring-host ansible_user=root
 ```
 2. Run the playbook:
 ```
-ansible-playbook ./default.yml -i inventory
+ansible-playbook ./default.yml -i inventory -e rs_version=2023.XXXX.X
 ```

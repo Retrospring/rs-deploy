@@ -1,0 +1,20 @@
+---
+- name: "Deploy"
+  import_tasks: deploy.yml
+
+- name: "Restart justask-sidekiq"
+  systemd:
+    name: "justask-sidekiq"
+    enabled: yes
+    state: restarted
+
+# no more web on this instance
+- name: "Ensure web@01 is disabled"
+  systemd:
+    name: "justask-web@01"
+    enabled: no
+
+- name: "Ensure web@02 is disabled"
+  systemd:
+    name: "justask-web@02"
+    enabled: no

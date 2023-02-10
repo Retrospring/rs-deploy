@@ -1,6 +1,13 @@
 ---
-- hosts: retrospring
+- name: "Prepare for new deployment on old hosts"
+  hosts: retrospring
+  become: yes
+  roles:
+    - name: legacy_prepare
+
+- name: "Deploy Sidekiq on old host and run migrations"
+  hosts: retrospring
   become: yes
   roles:
     #- name: nginx
-    - name: retrospring
+    - name: legacy_deploy
