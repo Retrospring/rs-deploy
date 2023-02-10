@@ -7,7 +7,7 @@ This deploys Retrospring to a server using the power of Ansible.
 1. Clone the `rs_secrets` repo somewhere
 
 2. Create a inventory file like this:
-```toml
+```ini
 [retrospring]
 retrospring-host ansible_user=root
 
