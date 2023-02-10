@@ -1,0 +1,17 @@
+---
+:concurrency: 5
+:pidfile: ./tmp/pids/sidekiq.pid
+staging:
+  :concurrency: 10
+production:
+  :concurrency: 10
+:queues:
+  #- default
+  - share
+  - carrierwave
+  # disabled, sendmail is configured on the old host
+  #- mailers
+  - question
+  # disabled, exports are done on the old host and served by nginx
+  #- export
+  - push_notification

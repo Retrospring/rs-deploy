@@ -1,4 +1,10 @@
 ---
+- name: "Prepare for new deployment"
+  hosts: retrospringnew
+  become: yes
+  roles:
+    - name: prepare
+
 - name: "Prepare for new deployment on old hosts"
   hosts: retrospring
   become: yes
@@ -11,3 +17,16 @@
   roles:
     #- name: nginx
     - name: legacy_deploy
+
+- name: "Deploy containerised Retrospring (web instances)"
+  hosts: retrospringnew_web
+  serial: "50%"
+  become: yes
+  roles:
+    - name: deploy
+
+- name: "Deploy containerised Retrospring (sidekiq instances)"
+  hosts: retrospringnew_sidekiq
+  become: yes
+  roles:
+    - name: deploy

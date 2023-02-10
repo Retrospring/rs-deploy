@@ -21,12 +21,6 @@
 - name: "Prepare for deployment"
   import_tasks: deploy.yml
 
-- name: "Create Puma configuration file"
-  copy:
-    src: "puma.rb"
-    dest: "{{ justask_base_app_path }}/shared/config/puma.rb"
-    force: yes
-
 - name: "Create justask SystemD unit for Sidekiq"
   copy:
     src: "justask-sidekiq.service"

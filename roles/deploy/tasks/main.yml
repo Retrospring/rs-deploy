@@ -1,0 +1,17 @@
+---
+
+- name: "Restart Retrospring SystemD unit"
+  ansible.builtin.systemd:
+    name: "retrospring-{{ rs_role }}"
+    enabled: yes
+    state: restarted
+
+- name: "Wait for / to return 200"
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:3000/"
+    method: "GET"
+  when: rs_role == "web"
+  register: _result
+  until: _result.status == 200
+  retries: 120 # 120 * 1 second = 2 minutes
+  delay: 1     # check every second
