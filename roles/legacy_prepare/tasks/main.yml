@@ -1,0 +1,32 @@
+---
+- name: "Create justask user"
+  user:
+    name: "justask"
+    comment: "justask-retrospring user"
+    create_home: yes
+    state: present
+
+- name: "Figure out which Ruby version to use"
+  uri:
+    url: "https://raw.githubusercontent.com/Retrospring/retrospring/{{ rs_version }}/.ruby-version"
+    return_content: yes
+  register: ruby_version_response
+- set_fact:
+    ruby_version: "{{ ruby_version_response.content | trim }}"
+
+- name: "Set up Ruby"
+  include_role:
+    name: rbenv
+
+- name: "Prepare for deployment"
+  import_tasks: deploy.yml
+
+- name: "Create justask SystemD unit for Sidekiq"
+  copy:
+    src: "justask-sidekiq.service"
+    dest: "/etc/systemd/system/justask-sidekiq.service"
+    mode: "0644"
+
+- name: "Reload SystemD"
+  systemd:
+    daemon_reload: yes

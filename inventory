@@ -1,0 +1,22 @@
+[retrospring]
+retrospring-001.aws.infra.retrospring.net ansible_user=root
+
+[retrospringnew:children]
+retrospringnew_web
+retrospringnew_sidekiq
+
+[retrospringnew_web]
+retrospring-web-[001:002].int.do.infra.retrospring.net
+
+[retrospringnew_sidekiq]
+retrospring-sidekiq-001.int.do.infra.retrospring.net
+
+[retrospringnew:vars]
+ansible_user=justask
+ansible_ssh_common_args='-A -o ProxyCommand="ssh -W %h:%p -q justask@retrospring-bastion.do.infra.retrospring.net"'
+
+[retrospringnew_web:vars]
+rs_role=web
+
+[retrospringnew_sidekiq:vars]
+rs_role=sidekiq

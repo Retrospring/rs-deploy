@@ -4,6 +4,7 @@ justask_shared_files:
   - "config/database.yml"
   - "config/justask.yml"
   - "config/secrets.yml"
+  - "config/sidekiq.yml"
   - "config/puma.rb"
   - "config/initializers/devise.rb"
 
@@ -15,7 +16,4 @@ justask_shared_dirs:
   - "tmp/sockets"
   - "public/uploads"
   - "public/system"
-  - "public/exports"
-
-justask_rake_tasks:
-  - "assets:precompile"
+  - "public/export"

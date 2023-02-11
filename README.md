@@ -4,12 +4,10 @@ This deploys Retrospring to a server using the power of Ansible.
 
 ## Usage
 
-1. Create a inventory file like this:
-```toml
-[retrospring]
-retrospring-host ansible_user=root
+1. Clone the `rs_secrets` repo somewhere
+
+2. Run the playbook (adapt `rs_secrets_path` to your needs, and make sure a
+container image for your version already exists):
 ```
-2. Run the playbook:
-```
-ansible-playbook ./default.yml -i inventory
+ansible-playbook ./default.yml -i inventory -e rs_secrets_path=../rs_secrets -e rs_version=2023.XXXX.X
 ```

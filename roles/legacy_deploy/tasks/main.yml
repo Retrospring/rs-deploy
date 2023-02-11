@@ -1,0 +1,34 @@
+---
+- block:
+  - name: "Run database migrations"
+    shell: |-
+      $SHELL -lc "env RAILS_ENV=production bundle exec rails db:migrate"
+    args:
+      chdir: "{{ _release_path }}"
+
+  - name: "Create a symlink to the current release -- we're done here!"
+    file:
+      src: "{{ _release_path }}"
+      dest: "{{ justask_base_app_path }}/current"
+      state: link
+      force: yes
+
+  become: true
+  become_user: justask
+
+- name: "Restart justask-sidekiq"
+  systemd:
+    name: "justask-sidekiq"
+    enabled: yes
+    state: restarted
+
+# no more web on this instance
+- name: "Ensure web@01 is disabled"
+  systemd:
+    name: "justask-web@01"
+    enabled: no
+
+- name: "Ensure web@02 is disabled"
+  systemd:
+    name: "justask-web@02"
+    enabled: no

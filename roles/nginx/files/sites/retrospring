@@ -27,8 +27,8 @@ server {
 
 # Some upstreams where requests are redirected to.
 upstream justask {
-    server unix:/var/run/justask-web-01/puma.sock;
-    server unix:/var/run/justask-web-02/puma.sock;
+    server 164.90.226.65:3000;
+    server 46.101.97.49:3000;
 }
 
 server {

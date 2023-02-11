@@ -1,0 +1,50 @@
+---
+- name: "Collect secret env vars"
+  ansible.builtin.include_vars:
+    file: "{{ rs_secrets_path }}/env_vars.yml"
+
+- name: "Combine env vars"
+  ansible.builtin.set_fact:
+    _env_vars: "{{ rs_env_vars | combine(rs_secret_env_vars) }}"
+
+- name: "Pull new release"
+  containers.podman.podman_image:
+    name: docker.io/retrospring/retrospring
+    tag: "{{ rs_version }}"
+
+- name: "Create shared configuration files"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/home/justask/{{ item }}"
+    force: yes
+    owner: "justask"
+    group: "users"
+    mode: "0644"
+  loop:
+    - "puma.rb"
+    - "sidekiq.yml"
+
+- name: "Create secret configuration files"
+  ansible.builtin.copy:
+    src: "{{ rs_secrets_path }}/files/{{ item }}"
+    dest: "/home/justask/{{ item }}"
+    force: yes
+    owner: "justask"
+    group: "users"
+    mode: "0644"
+  loop:
+    - "devise.rb"
+    - "justask.yml"
+
+- name: "Create SystemD unit"
+  ansible.builtin.template:
+    src: "retrospring-{{ rs_role }}.service.j2"
+    dest: "/etc/systemd/system/retrospring-{{ rs_role }}.service"
+    force: yes
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: "Reload SystemD"
+  ansible.builtin.systemd:
+    daemon_reload: yes
