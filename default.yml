@@ -1,4 +1,10 @@
 ---
+- name: "Set up Grafana Cloud agent"
+  hosts: all
+  become: yes
+  roles:
+    - name: grafanacloud
+
 - name: "Prepare for new deployment"
   hosts: retrospringnew
   become: yes

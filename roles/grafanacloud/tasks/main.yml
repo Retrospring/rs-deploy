@@ -1,0 +1,80 @@
+---
+- name: "Figure out if we want to roll out the Grafana Cloud agent"
+  ansible.builtin.meta: end_play
+  # super confusing: `when` is inversed with `end_play` -- so a `false`y value will continue with the play????
+  when: not (rs_init_grafana_cloud | default(false)) | bool
+
+- name: "Collect secret values"
+  ansible.builtin.include_vars:
+    file: "{{ rs_secrets_path }}/grafanacloud.yml"
+
+- name: "Set some values"
+  ansible.builtin.set_fact:
+    rs_grafana_hostname: '{{ rs_grafana_hostname | default(ansible_hostname) | replace("tf-", "") }}'
+
+- name: "Create grafana-agent user"
+  ansible.builtin.user:
+    name: "grafana-agent"
+    comment: "Grafana Cloud agent"
+    create_home: yes
+    state: present
+
+- name: "Install unzip"
+  ansible.builtin.package:
+    name: unzip
+    state: present
+
+- name: "Create tempdir to unpack agent to"
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: "grafana-agent"
+  register: _tempdir
+
+- name: "Download and unpack Grafana Agent"
+  ansible.builtin.unarchive:
+    src: "https://github.com/grafana/agent/releases/download/v{{ rs_grafana_agent_version }}/grafana-agent-linux-amd64.zip"
+    dest: "{{ _tempdir.path }}"
+    remote_src: yes
+
+- name: "Copy Grafana Agent binary to /usr/bin"
+  ansible.builtin.copy:
+    src: "{{ _tempdir.path }}/grafana-agent-linux-amd64"
+    dest: "/usr/local/bin/grafana-agent"
+    remote_src: yes
+    mode: "0755"
+
+- name: "Clean up tempdir"
+  ansible.builtin.file:
+    path: "{{ _tempdir.path }}"
+    state: absent
+
+- name: "Install Grafana Cloud Agent SystemD unit"
+  ansible.builtin.copy:
+    src: "grafana-agent.service"
+    dest: "/etc/systemd/system/grafana-agent.service"
+    mode: "0644"
+
+- name: "Install Grafana Cloud Agent sysconfig"
+  ansible.builtin.copy:
+    src: "grafana-agent"
+    dest: "/etc/sysconfig/grafana-agent"
+    mode: "0644"
+
+- name: "Install Grafana Cloud Agent configuration"
+  ansible.builtin.template:
+    src: "grafana-agent.yaml.j2"
+    dest: "/etc/grafana-agent.yaml"
+    mode: "0644"
+
+- name: "Ensure /var/log/messages is world readable"
+  ansible.builtin.file:
+    path: "/var/log/messages"
+    mode: "0644"
+    state: file
+
+- name: "Start the Grafana Cloud Agent"
+  ansible.builtin.systemd:
+    name: "grafana-agent"
+    enabled: yes
+    daemon_reload: yes
+    state: restarted
