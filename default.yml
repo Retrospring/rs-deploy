@@ -6,7 +6,7 @@
     - name: grafanacloud
 
 - name: "Prepare for new deployment"
-  hosts: retrospringnew
+  hosts: retrospringnew_app
   become: yes
   roles:
     - name: prepare

@@ -9,6 +9,11 @@ integrations:
         username: {{ rs_grafana_prometheus_username }}
         password: {{ rs_grafana_prometheus_password }}
       url: {{ rs_grafana_prometheus_endpoint }}
+{% if rs_role | default("") == "redis" %}
+  redis_exporter:
+    enabled: true
+    redis_addr: localhost:6379
+{% endif %}
 
 logs:
   configs:

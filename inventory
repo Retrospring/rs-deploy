@@ -1,7 +1,18 @@
 [retrospring]
 retrospring-001.aws.infra.retrospring.net ansible_user=root rs_grafana_hostname=retrospring-001.aws.infra.rrerr.net
 
+[retrospringnew]
+retrospring-bastion.do.infra.retrospring.net rs_role=bastion
+
 [retrospringnew:children]
+retrospringnew_app
+retrospringnew_db
+
+[retrospringnew:vars]
+ansible_user=justask
+ansible_ssh_common_args='-A -o ProxyCommand="ssh -W %h:%p -q justask@retrospring-bastion.do.infra.retrospring.net"'
+
+[retrospringnew_app:children]
 retrospringnew_web
 retrospringnew_sidekiq
 
@@ -11,12 +22,24 @@ retrospring-web-[001:002].int.do.infra.retrospring.net
 [retrospringnew_sidekiq]
 retrospring-sidekiq-001.int.do.infra.retrospring.net
 
-[retrospringnew:vars]
-ansible_user=justask
-ansible_ssh_common_args='-A -o ProxyCommand="ssh -W %h:%p -q justask@retrospring-bastion.do.infra.retrospring.net"'
-
 [retrospringnew_web:vars]
 rs_role=web
 
 [retrospringnew_sidekiq:vars]
 rs_role=sidekiq
+
+[retrospringnew_db:children]
+retrospringnew_postgres
+retrospringnew_redis
+
+[retrospringnew_postgres]
+retrospring-postgres-001.int.do.infra.retrospring.net
+
+[retrospringnew_postgres:vars]
+rs_role=postgres
+
+[retrospringnew_redis]
+retrospring-redis-001.int.do.infra.retrospring.net
+
+[retrospringnew_redis:vars]
+rs_role=redis
