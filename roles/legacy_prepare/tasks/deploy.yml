@@ -77,5 +77,15 @@
     args:
       chdir: "{{ _release_path }}"
 
+  - name: "Fetch and unpack assets from new release"
+    ansible.builtin.shell: |
+      docker pull {{ image | quote }}
+      docker run --rm {{ image | quote }} sh -c {{ pack | quote }} | tar x
+    args:
+      chdir: "{{ _release_path }}/public"
+    vars:
+      image: "docker.io/retrospring/retrospring:{{ rs_version }}"
+      pack: "cd /opt/retrospring/app/public && tar cf - ."
+
   become: true
   become_user: justask
