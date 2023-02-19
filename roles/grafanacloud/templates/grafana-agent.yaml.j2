@@ -52,7 +52,7 @@ metrics:
           static_configs:
             - targets: ['localhost:3000']
               labels:
-                instance: retrospring-web-001
+                instance: {{ rs_grafana_hostname }}
                 role: "web"
       remote_write:
         - basic_auth:
