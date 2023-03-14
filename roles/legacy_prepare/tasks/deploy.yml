@@ -77,6 +77,14 @@
     args:
       chdir: "{{ _release_path }}"
 
+  - name: "Collect ghcr secrets"
+    ansible.builtin.include_vars:
+      file: "{{ rs_secrets_path }}/ghcr.yml"
+
+  - name: "Log in to registry"
+    ansible.builtin.shell: |
+      docker login ghcr.io -u {{ ghcr_username | quote }} -p {{ ghcr_password | quote }}
+
   - name: "Fetch and unpack assets from new release"
     ansible.builtin.shell: |
       docker pull {{ image | quote }}
@@ -84,7 +92,7 @@
     args:
       chdir: "{{ _release_path }}/public"
     vars:
-      image: "docker.io/retrospring/retrospring:{{ rs_version }}"
+      image: "ghcr.io/retrospring/retrospring:{{ rs_version }}"
       pack: "cd /opt/retrospring/app/public && tar cf - ."
 
   become: true
