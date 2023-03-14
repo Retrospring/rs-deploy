@@ -9,7 +9,7 @@
 
 - name: "Pull new release"
   containers.podman.podman_image:
-    name: docker.io/retrospring/retrospring
+    name: ghcr.io/retrospring/retrospring
     tag: "{{ rs_version }}"
 
 - name: "Create shared configuration files"

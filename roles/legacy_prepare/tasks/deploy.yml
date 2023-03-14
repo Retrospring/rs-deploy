@@ -84,7 +84,7 @@
     args:
       chdir: "{{ _release_path }}/public"
     vars:
-      image: "docker.io/retrospring/retrospring:{{ rs_version }}"
+      image: "ghcr.io/retrospring/retrospring:{{ rs_version }}"
       pack: "cd /opt/retrospring/app/public && tar cf - ."
 
   become: true
