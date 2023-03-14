@@ -7,16 +7,6 @@
   ansible.builtin.set_fact:
     _env_vars: "{{ rs_env_vars | combine(rs_secret_env_vars) }}"
 
-- name: "Collect ghcr secrets"
-  ansible.builtin.include_vars:
-    file: "{{ rs_secrets_path }}/ghcr.yml"
-
-- name: "Log in to registry"
-  containers.podman.podman_login:
-    registry: "ghcr.io"
-    username: "{{ ghcr_username }}"
-    password: "{{ ghcr_password }}"
-
 - name: "Pull new release"
   containers.podman.podman_image:
     name: ghcr.io/retrospring/retrospring
