@@ -15,3 +15,11 @@ production:
   # disabled, exports are done on the old host and served by nginx
   #- export
   - push_notification
+  - scheduler
+
+:scheduler:
+  :schedule:
+    inbox_cleanup:
+      every: 1m
+      class: Scheduler::InboxCleanupScheduler
+      queue: scheduler
